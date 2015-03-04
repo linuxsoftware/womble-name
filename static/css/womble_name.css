@@ -1,0 +1,110 @@
+/*-----------------------------------------------------------------------*/
+/* Womble Name page */
+/*-----------------------------------------------------------------------*/
+
+body { 
+    margin:                0;
+    border:                0;
+    padding:               0;
+    height:                100%;
+    font-size:             small;
+    font-family:           Arial,sans-serif;
+}
+#wrapper {
+    position:              relative;
+    width:                 100%;
+    min-height:            100%;
+    background-color:      #f9f8f7;
+    background-image:      url(/static/img/wombles.png);
+    background-position:   bottom center;
+    background-repeat:     no-repeat;
+}
+
+main {
+    max-width:             700px;
+    padding:               20px 20px 340px 20px;
+    margin:                0 auto;
+}
+
+.womble {
+    position:              relative;
+    padding:               20px;
+    min-width:             470px;
+    max-width:             700px;
+    margin:                0px;
+    background:            #1b184f;
+    color:                 #ddc;
+    -webkit-border-radius: 10px;
+       -moz-border-radius: 10px;
+            border-radius: 10px;
+}
+.womble h2 {
+    font-size:             22px;
+    font-style:            italic;
+    font-weight:           normal;
+    color:                 #ddc;
+    margin:                0;
+    padding:               2px 0;
+    font-family:           Arial,sans-serif;
+}
+.womble a {
+    color:                 #ddc;
+}
+.womble .instructions {
+    padding:               2px 2px 10px;
+}
+.womble .globe {
+    width:                 181px;
+    height:                181px;
+    background-image:      url(/static/img/globe.png);
+}
+.womble .controls {
+    padding-top:           20px;
+}
+.womble .controls .speed {
+    width:                 100px;
+    height:                16px;
+}
+.womble .latlng {
+    padding:               2px;
+    position:              absolute;
+    top:                   20px;
+    right:                 20px;
+    /* display: none; */
+}
+.womble .your-name {
+    padding:               2px;
+    position:              absolute;
+    top:                   70px;
+    left:                  220px;
+    display:               none;
+}
+.womble .your-name .womble-name {
+    font-size:             42px;
+    line-height:           42px;
+    font-style:            normal;
+    font-weight:           bold;
+    letter-spacing:        -1.5px;
+    color:                 yellow;
+    margin:                0;
+    padding:               1px 0 1px 10px;
+}
+.womble .your-name a.go-again {
+    display:               block;
+    padding:               2px;
+}
+.womble .slogan {
+    padding:               2px;
+    position:              absolute;
+    bottom:                20px;
+    right:                 20px;
+}
+section {
+    background:            #ededed;
+    padding:               10px;
+}
+
+.googmap {
+    width:  500px;
+    height: 400px;
+}
