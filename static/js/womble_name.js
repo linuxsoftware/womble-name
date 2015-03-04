@@ -154,7 +154,7 @@
     Globe.prototype.pickName = function(results) {
       var component, names, nm, result, retval, type, validTypes, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
       retval = "";
-      validTypes = ["political", "country", "administrative_area_level_1", "administrative_area_level_2", "administrative_area_level_3", "administrative_area_level_4", "administrative_area_level_5", "colloquial_area", "locality", "ward", "neighborhood", "natural_feature", "airport", "park", "point_of_interest"];
+      validTypes = ["administrative_area_level_1", "administrative_area_level_2", "administrative_area_level_3", "administrative_area_level_4", "administrative_area_level_5", "colloquial_area", "locality", "ward", "neighborhood", "natural_feature", "airport", "park", "point_of_interest"];
       names = [];
       for (_i = 0, _len = results.length; _i < _len; _i++) {
         result = results[_i];
@@ -167,7 +167,7 @@
             nm = component.long_name;
             nm = nm.replace(/united states/i, "America");
             nm = nm.replace(/united kingdom/i, "Britain");
-            nm = nm.replace(/\b(of\ the\ union\ of|state\ of|county|province|district|region|krai|autonomous|unorganized|republic|state|okrug|oblast|rayon|kray|city|department|governorate)\b/gi, "");
+            nm = nm.replace(/\b(republic\ of|of\ the\ union\ of|state\ of|county|province|district|region|krai|autonomous|unorganized|republic|state|okrug|oblast|rayon|kray|city|department|governorate)\b/gi, "");
             nm = nm.replace(/^\w+\ *\((\w+)\)/, "$1");
             nm = nm.trim();
             if (nm.length > 4 && __indexOf.call(validTypes, type) >= 0 && __indexOf.call(names, nm) < 0) {
@@ -184,7 +184,7 @@
 
     Globe.prototype.addTitle = function(name) {
       var draw, titles;
-      titles = ["Madame", "Great Uncle", "Cousin", "Aunt", "Great Aunt", "Uncle", "Cousin", "Auntie", "Gramps", "Granny", "Cousin", "Captain", "Major", "Cousin", "Cousin", "Professor"];
+      titles = ["Madame", "Great Uncle", "Cousin", "Aunt", "Great Aunt", "Uncle", "Cousin", "Auntie", "Gramps", "Granny", "Cousin", "Cousin", "Cousin", "Professor"];
       if (name === "America" || name === "Russia" || name === "China" || name === "France" || name === "Britain" || name === "Canada" || name === "Australia") {
         draw = Math.floor(Math.random() * titles.length);
       } else {
