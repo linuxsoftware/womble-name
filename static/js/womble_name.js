@@ -20,7 +20,7 @@
       this.x = null;
       this.y = null;
       this.slide = 0;
-      this.maxSlide = 12;
+      this.maxSlide = 20;
       this.block.click(this.pickSpot.bind(this));
       speedCtrl = $(".womble .controls .speed");
       speedCtrl[0].value = this.speed;
@@ -70,16 +70,20 @@
           },
           'language': 'en'
         }, function(results, status) {
-          var name;
+          var GeoStatus, name;
           name = "";
-          if (status === google.maps.GeocoderStatus.OK) {
+          GeoStatus = google.maps.GeocoderStatus;
+          if (status === GeoStatus.OK) {
             name = _this.pickName(results);
+          } else if (status === GeoStatus.OVER_QUERY_LIMIT || status === GeoStatus.REQUEST_DENIED) {
+            _this.x = _this.y = null;
+            _this.slide = 0;
           }
           if (name) {
             _this.stopGlobe();
             return _this.showName(lat, lng, _this.addTitle(name));
           } else {
-            return _this.spinGlobe();
+            return requestAnimationFrame(_this.spinGlobe.bind(_this));
           }
         });
       } else {

@@ -17,7 +17,7 @@ class Globe
         @x         = null
         @y         = null
         @slide     = 0
-        @maxSlide  = 12
+        @maxSlide  = 20
         @block.click(@pickSpot.bind(@))
         speedCtrl = $(".womble .controls .speed")
         speedCtrl[0].value = @speed
@@ -55,13 +55,18 @@ class Globe
                ,
                 (results, status) =>
                     name = ""
-                    if status == google.maps.GeocoderStatus.OK
+                    GeoStatus = google.maps.GeocoderStatus
+                    if status == GeoStatus.OK
                         name = @pickName(results)
+                    else if status in [GeoStatus.OVER_QUERY_LIMIT,
+                                       GeoStatus.REQUEST_DENIED]
+                        @x = @y = null
+                        @slide = 0
                     if name
                         @stopGlobe()
                         @showName(lat, lng, @addTitle(name))
                     else
-                        @spinGlobe()
+                        requestAnimationFrame(@spinGlobe.bind(@))
         else
             if delay
                 setTimeout (=> requestAnimationFrame(@spinGlobe.bind(@))), delay
@@ -93,7 +98,7 @@ class Globe
     pickName: (results) ->
         retval = ""
         validTypes = [
-            #"political", "country", "administrative_area_level_1",
+            #"political", "country",
             "administrative_area_level_1",
             "administrative_area_level_2", "administrative_area_level_3",
             "administrative_area_level_4", "administrative_area_level_5",
