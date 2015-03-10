@@ -12,26 +12,27 @@
       this.left = offset.left;
       this.top = offset.top;
       this.diameter = 181;
+      this.radius = this.diameter / 2;
       this.numFrames = 150;
       this.speed = 60;
       this.frame = this.numFrames;
       this.lastDraw = new Date().getTime();
-      this.block.click(function(ev) {
-        return _this.stopGlobe(ev);
-      });
+      this.x = null;
+      this.y = null;
+      this.slide = 0;
+      this.maxSlide = 12;
+      this.block.click(this.pickSpot.bind(this));
       speedCtrl = $(".womble .controls .speed");
       speedCtrl[0].value = this.speed;
       speedCtrl.change(function(ev) {
         return _this.speed = ev.target.value;
       });
       this.geocoder = new google.maps.Geocoder();
-      $(".womble .go-again").click(function() {
-        return _this.goAgain();
-      });
+      $(".womble .go-again").click(this.goAgain.bind(this));
     }
 
     Globe.prototype.spinGlobe = function() {
-      var advFrame, delay, now, offset, over,
+      var advFrame, delay, lat, lng, now, offset, over, _ref,
         _this = this;
       if (this.speed <= 0) {
         return;
@@ -52,57 +53,66 @@
       if (this.frame < 0) {
         this.frame += this.numFrames;
       }
-      offset = this.frame * this.block.width();
+      offset = this.frame * this.diameter;
       this.block.css('background-position', "" + offset + "px 0");
-      if (delay) {
-        return setTimeout((function() {
-          return requestAnimationFrame(_this.spinGlobe.bind(_this));
-        }), delay);
+      if (this.x !== null) {
+        if (++this.slide > this.maxSlide) {
+          this.x = this.y = null;
+          this.slide = 0;
+        }
+      }
+      if (this.slide % 2) {
+        _ref = this.unproject(this.x, this.y), lat = _ref[0], lng = _ref[1];
+        return this.geocoder.geocode({
+          'latLng': {
+            lat: lat,
+            lng: lng
+          },
+          'language': 'en'
+        }, function(results, status) {
+          var name;
+          name = "";
+          if (status === google.maps.GeocoderStatus.OK) {
+            name = _this.pickName(results);
+          }
+          if (name) {
+            _this.stopGlobe();
+            return _this.showName(lat, lng, _this.addTitle(name));
+          } else {
+            return _this.spinGlobe();
+          }
+        });
       } else {
-        return requestAnimationFrame(this.spinGlobe.bind(this));
+        if (delay) {
+          return setTimeout((function() {
+            return requestAnimationFrame(_this.spinGlobe.bind(_this));
+          }), delay);
+        } else {
+          return requestAnimationFrame(this.spinGlobe.bind(this));
+        }
       }
     };
 
-    Globe.prototype.stopGlobe = function(ev) {
-      var lat, latlng, lng, _ref;
-      if (this.speed <= 0) {
-        return;
-      }
-      _ref = this.unproject(ev), lat = _ref[0], lng = _ref[1];
-      if (lat === void 0 || lng === void 0) {
-        return;
-      }
-      latlng = "" + (lat.toFixed(6)) + ", " + (lng.toFixed(6));
-      $(".womble .latlng").text("" + latlng);
-      $(".womble .latlng").attr('href', "https://maps.google.com/maps" + ("?q=" + latlng + "&z=5"));
-      this.speed = 0;
-      return this.wombleName(lat, lng, 0, function(name) {
-        $('.womble .womble-name').text(name);
-        return $('.womble .your-name').show();
-      });
+    Globe.prototype.stopGlobe = function() {
+      return this.speed = 0;
     };
 
-    Globe.prototype.goAgain = function() {
-      this.frame = this.numFrames;
-      this.speed = $(".womble .controls .speed")[0].value;
-      $('.womble .womble-name').text("");
-      $('.womble .your-name').hide();
-      $(".womble .latlng").text("");
-      $(".womble .latlng").attr('href', "#");
-      return this.spinGlobe();
+    Globe.prototype.pickSpot = function(ev) {
+      var p, x, y;
+      x = ev.pageX - this.left - this.radius;
+      y = -(ev.pageY - this.top - this.radius);
+      p = Math.sqrt(x * x + y * y);
+      if (p <= this.radius) {
+        this.x = x;
+        return this.y = y;
+      }
     };
 
-    Globe.prototype.unproject = function(ev) {
-      var c, lat, lng, lng0, p, radius, radsToDegs, x, y;
-      radius = this.diameter / 2;
-      x = ev.pageX - this.left - radius;
-      y = -(ev.pageY - this.top - radius);
+    Globe.prototype.unproject = function(x, y) {
+      var c, lat, lng, lng0, p, radsToDegs;
       lng0 = this.frame * (Math.PI * 2 / this.numFrames);
       p = Math.sqrt(x * x + y * y);
-      if (p > radius) {
-        return [];
-      }
-      c = Math.asin(p / radius);
+      c = Math.asin(p / this.radius);
       lat = Math.asin(y * Math.sin(c) / p);
       lng = lng0 + Math.atan2(x * Math.sin(c), p * Math.cos(c));
       if (lng > Math.PI) {
@@ -112,43 +122,6 @@
         return rads * 180 / Math.PI;
       };
       return [radsToDegs(lat), radsToDegs(lng)];
-    };
-
-    Globe.prototype.wombleName = function(lat1, lng1, dist, callback) {
-      var angle, x, y,
-        _this = this;
-      angle = Math.random() * Math.PI * 2;
-      y = Math.sin(angle) * dist;
-      x = Math.cos(angle) * dist;
-      return this.geocoder.geocode({
-        'latLng': {
-          lat: lat1 + y,
-          lng: lng1 + x
-        },
-        'language': 'en'
-      }, function(results, status) {
-        var name;
-        if (status === google.maps.GeocoderStatus.OK) {
-          name = _this.pickName(results);
-        }
-        if (name) {
-          name = _this.addTitle(name);
-          return callback(name);
-        } else {
-          dist += 1.5;
-          if (dist > 5) {
-            if (_this.frame >= 120 && _this.frame < 150) {
-              return callback(_this.addTitle("Atlantic"));
-            } else if (_this.frame >= 50 && _this.frame <= 110) {
-              return callback(_this.addTitle("Pacific"));
-            } else {
-              return callback(_this.addTitle("Earth"));
-            }
-          } else {
-            return _this.wombleName(lat1, lng1, dist, callback);
-          }
-        }
-      });
     };
 
     Globe.prototype.pickName = function(results) {
@@ -167,7 +140,7 @@
             nm = component.long_name;
             nm = nm.replace(/united states/i, "America");
             nm = nm.replace(/united kingdom/i, "Britain");
-            nm = nm.replace(/\b(republic\ of|of\ the\ union\ of|state\ of|county|province|district|region|krai|autonomous|unorganized|republic|state|okrug|oblast|rayon|kray|city|department|governorate)\b/gi, "");
+            nm = nm.replace(/\b(of|the|union|state|county|province|district|region|krai|autonomous|unorganized|republic|state|okrug|oblast|rayon|kray|city|department|governorate)\b/gi, "");
             nm = nm.replace(/^\w+\ *\((\w+)\)/, "$1");
             nm = nm.trim();
             if (nm.length > 4 && __indexOf.call(validTypes, type) >= 0 && __indexOf.call(names, nm) < 0) {
@@ -184,17 +157,34 @@
 
     Globe.prototype.addTitle = function(name) {
       var draw, titles;
-      titles = ["Madame", "Great Uncle", "Cousin", "Aunt", "Great Aunt", "Uncle", "Cousin", "Auntie", "Gramps", "Granny", "Cousin", "Cousin", "Cousin", "Professor"];
-      if (name === "America" || name === "Russia" || name === "China" || name === "France" || name === "Britain" || name === "Canada" || name === "Australia") {
-        draw = Math.floor(Math.random() * titles.length);
-      } else {
-        draw = Math.floor(Math.random() * (titles.length + name.length));
-      }
+      titles = ["Madame", "Great Uncle", "Cousin", "Aunt", "Great Aunt", "Uncle", "Cousin", "Auntie", "Gramps", "Granny", "Cousin", "Cousin", "Cousin", "Professor", "Cousin", "Uncle"];
+      draw = Math.floor(Math.random() * (titles.length + name.length));
       if (draw < titles.length) {
         return "" + titles[draw] + " " + name;
       } else {
         return name;
       }
+    };
+
+    Globe.prototype.showName = function(lat, lng, name) {
+      var latlng;
+      latlng = "" + (lat.toFixed(6)) + ", " + (lng.toFixed(6));
+      $(".womble .latlng").text("" + latlng);
+      $(".womble .latlng").attr('href', "https://maps.google.com/maps" + ("?q=" + latlng + "&z=5"));
+      $('.womble .womble-name').text(name);
+      return $('.womble .your-name').show();
+    };
+
+    Globe.prototype.goAgain = function() {
+      this.frame = this.numFrames;
+      this.x = this.y = null;
+      this.slide = 0;
+      this.speed = $(".womble .controls .speed")[0].value;
+      $('.womble .womble-name').text("");
+      $('.womble .your-name').hide();
+      $(".womble .latlng").text("");
+      $(".womble .latlng").attr('href', "#");
+      return this.spinGlobe();
     };
 
     return Globe;
