@@ -142,8 +142,6 @@
           for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
             type = _ref1[_k];
             nm = component.long_name;
-            nm = nm.replace(/united states/i, "America");
-            nm = nm.replace(/united kingdom/i, "Britain");
             nm = nm.replace(/\b(of|the|union|state|county|province|district|region|krai|autonomous|unorganized|republic|state|okrug|oblast|rayon|kray|city|department|governorate)\b/gi, "");
             nm = nm.replace(/^\w+\ *\((\w+)\)/, "$1");
             nm = nm.trim();

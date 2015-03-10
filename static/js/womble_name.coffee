@@ -109,8 +109,6 @@ class Globe
             for component in result.address_components
                 for type in component.types
                     nm = component.long_name
-                    nm = nm.replace(/united states/i, "America")
-                    nm = nm.replace(/united kingdom/i, "Britain")
                     nm = nm.replace(/\b(of|the|union|state|county|province|district|region|krai|autonomous|unorganized|republic|state|okrug|oblast|rayon|kray|city|department|governorate)\b/gi, "")
                     nm = nm.replace(/^\w+\ *\((\w+)\)/, "$1")
                     nm = nm.trim()
