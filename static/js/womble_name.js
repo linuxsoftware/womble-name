@@ -62,7 +62,7 @@
         }
       }
       if (this.slide % 2) {
-        _ref = this.unproject(this.x, this.y), lat = _ref[0], lng = _ref[1];
+        _ref = this.unproject(), lat = _ref[0], lng = _ref[1];
         return this.geocoder.geocode({
           'latLng': {
             lat: lat,
@@ -112,13 +112,13 @@
       }
     };
 
-    Globe.prototype.unproject = function(x, y) {
+    Globe.prototype.unproject = function() {
       var c, lat, lng, lng0, p, radsToDegs;
       lng0 = this.frame * (Math.PI * 2 / this.numFrames);
-      p = Math.sqrt(x * x + y * y);
+      p = Math.sqrt(this.x * this.x + this.y * this.y);
       c = Math.asin(p / this.radius);
-      lat = Math.asin(y * Math.sin(c) / p);
-      lng = lng0 + Math.atan2(x * Math.sin(c), p * Math.cos(c));
+      lat = Math.asin(this.y * Math.sin(c) / p);
+      lng = lng0 + Math.atan2(this.x * Math.sin(c), p * Math.cos(c));
       if (lng > Math.PI) {
         lng -= Math.PI * 2;
       }

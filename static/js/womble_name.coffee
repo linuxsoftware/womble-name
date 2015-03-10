@@ -48,7 +48,7 @@ class Globe
                 @x = @y = null
                 @slide = 0
         if @slide % 2
-            [lat, lng] = @unproject(@x, @y)
+            [lat, lng] = @unproject()
             @geocoder.geocode
                 'latLng':   lat: lat, lng: lng
                 'language': 'en'
@@ -84,12 +84,12 @@ class Globe
             @x = x
             @y = y
 
-    unproject: (x, y) ->
+    unproject: ->
         lng0 = @frame * (Math.PI*2 / @numFrames)
-        p = Math.sqrt(x*x + y*y)
+        p = Math.sqrt(@x*@x + @y*@y)
         c = Math.asin(p / @radius)
-        lat = Math.asin(y*Math.sin(c) / p)
-        lng = lng0 + Math.atan2(x*Math.sin(c), p*Math.cos(c))
+        lat = Math.asin(@y*Math.sin(c) / p)
+        lng = lng0 + Math.atan2(@x*Math.sin(c), p*Math.cos(c))
         if lng > Math.PI
             lng -= Math.PI*2
         radsToDegs = (rads) -> rads * 180 / Math.PI
